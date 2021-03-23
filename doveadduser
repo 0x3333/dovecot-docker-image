@@ -1,0 +1,40 @@
+#!/bin/sh
+
+USERS_FILE=$(readlink -f "${USERS_FILE:-"/etc/dovecot/users"}")
+PASS_SCHEME="${PASS_SCHEME:-"ssha256"}"
+
+usage() {
+    cat << EOF
+Add a user
+
+Usage: $0 EMAIL PASSWORD
+
+Users file(\$USERS_FILE): ${USERS_FILE}
+Password scheme(\$PASS_SCHEME): ${PASS_SCHEME}
+EOF
+}
+
+EMAIL=$1
+PASS=$2
+
+if [ -z "$EMAIL" ] || [ -z "$PASS" ] ; then
+    usage
+    exit 1
+fi
+
+if [ ! -f "${USERS_FILE}" ]; then
+    echo "Users file not found(${USERS_FILE})!"
+    exit 1
+fi
+
+cat "${USERS_FILE}" | grep -iq "^${EMAIL}"
+if [ "$?" -eq "0" ] ; then
+    echo "User already exists!"
+    exit 2
+fi
+
+HASH=$(doveadm pw -s ${PASS_SCHEME} -p "$PASS")
+
+echo "${EMAIL}:${HASH}::::::" >> "${USERS_FILE}"
+
+echo "User added successfully!"

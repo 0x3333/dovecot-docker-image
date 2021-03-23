@@ -12,10 +12,10 @@
 #	make release-all
 
 
-IMAGE_NAME := instrumentisto/dovecot
+IMAGE_NAME := 0x3333/dovecot
 ALL_IMAGES := \
-	debian:2.2.27.0,2.2.27,2.2,2,latest \
-	alpine:2.2.27.0-alpine,2.2.27-alpine,2.2-alpine,2-alpine,alpine
+	debian:2.3.14.0,2.3.14,2.3,2,latest \
+	alpine:2.3.14.0-alpine,2.3.14-alpine,2.3-alpine,2-alpine,alpine
 #	<Dockerfile>:<version>,<tag1>,<tag2>,...
 
 
@@ -42,7 +42,7 @@ eq = $(if $(or $(1),$(2)),$(and $(findstring $(1),$(2)),\
 no-cache-arg = $(if $(call eq,$(no-cache),yes),--no-cache,)
 
 image:
-	docker build $(no-cache-arg) -t $(IMAGE_NAME):$(VERSION) $(DOCKERFILE)
+	docker build $(no-cache-arg) -t $(IMAGE_NAME):$(VERSION) -f $(DOCKERFILE)/Dockerfile .
 
 
 

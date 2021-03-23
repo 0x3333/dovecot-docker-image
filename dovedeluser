@@ -1,0 +1,37 @@
+#!/bin/sh
+
+USERS_FILE=$(readlink -f "${USERS_FILE:-"/etc/dovecot/users"}")
+
+usage() {
+    cat << EOF
+Remove a user
+
+Usage: $0 EMAIL
+
+Users file(\$USERS_FILE): ${USERS_FILE}
+EOF
+}
+
+EMAIL=$1
+
+if [ -z "$EMAIL" ] ; then
+    usage
+    exit 1
+fi
+
+if [ ! -f "${USERS_FILE}" ]; then
+    echo "Users file not found!"
+    exit 1
+fi
+
+cat "${USERS_FILE}" | cut -d ':' -f 1 | grep -q "$EMAIL"
+
+if [ "$?" -ne "0" ] ; then
+    echo "User doesn't exists!"
+    exit 2
+fi
+
+cat "${USERS_FILE}" | grep -vi "^${EMAIL}" > "${USERS_FILE}.tmp"
+mv -f "${USERS_FILE}.tmp" "${USERS_FILE}"
+
+echo "User removed successfully!"
